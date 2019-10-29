@@ -39,6 +39,10 @@
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/log-in-button"
+        android:src="@drawable/log-in-button"
+        android:layout_gravity="center_horizontal"
+        android:background="@android:color/transparent">
+
+    </ImageButton>
 
 </LinearLayout>
