@@ -10,13 +10,22 @@ import android.widget.EditText;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.firebase.ui.auth.IdpResponse;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
 
-    /*
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private static final int RC_SIGN_IN = 123;
+
+    //Decleration of Firebase Objects
     FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthStateListener;
-    */
+    FirebaseFirestore db;
+    FirebaseUser user;
+    FirebaseAuthException firebaseAuthException;
 
     private EditText mEmailField;
     private EditText mPasswordField;
@@ -26,14 +35,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        /*
+        //Initialization of Firebase Objects
         mAuth = FirebaseAuth.getInstance();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        */
-        //Email and Password input
+        db = FirebaseFirestore.getInstance();
+
+        //Initialization of Email and Password EditTexts
         mEmailField = findViewById(R.id.emailEditText);
         mPasswordField = findViewById(R.id.passwordEditText);
 
+
+        //Check and warn if input fields are empty
         mEmailField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -53,6 +64,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             }
         });
 
+        //Check and warn if input fields are empty
         mPasswordField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -71,11 +83,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
             }
         });
-        //Buttons, LoginVerfahren
+
+        //Buttons for login options
         findViewById(R.id.loginButton).setOnClickListener(this);
         findViewById(R.id.googleSignInButton).setOnClickListener(this);
         findViewById(R.id.facebookSignInButton).setOnClickListener(this);
         findViewById(R.id.signUpIntentButton).setOnClickListener(this);
+
+
 
         /*loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,11 +119,35 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     */
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RC_SIGN_IN) {
+            IdpResponse response = IdpResponse.fromResultIntent(data);
+
+            if (resultCode == RESULT_OK) {
+                // Successfully signed in
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                // ...
+            } else {
+                // Sign in failed. If response is null the user canceled the
+                // sign-in flow using the back button. Otherwise check
+                // response.getError().getErrorCode() and handle the error.
+                if(response==null){return;}
+                //TODO exceptionHandle();
+                // ...
+            }
+        }
+    }
+
+    //Detect which login option has chosen
+    //Detect if sign up function is chosen
+    @Override
     public void onClick(View v) {
         int logInType = v.getId();
-        switch (logInType){
+        switch (logInType) {
             case R.id.loginButton:
-                //ToDo loginWithEmailAndPassword();
+                //TODO login()
                 break;
             case R.id.googleSignInButton:
                 //ToDo googleSignIn();
@@ -122,6 +161,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    //Update profile information for the logged in user
+    protected void updateUI(FirebaseUser user) {
+        if (user != null) {
+            String userUid = user.getUid();
+            //Get user info from db
+            db.collection("users").document(userUid).get();
+            //TODO setProfile();
+        }else{return;}
+    }
     /*
     //Getters and Setters
     public FirebaseAuth getmAuth() {
