@@ -4,15 +4,20 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.firebase.ui.auth.IdpResponse;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -20,12 +25,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int RC_SIGN_IN = 123;
+    private static final String TAG = "Login Activity: ";
 
     //Decleration of Firebase Objects
     FirebaseAuth mAuth;
     FirebaseFirestore db;
     FirebaseUser user;
-    FirebaseAuthException firebaseAuthException;
 
     private EditText mEmailField;
     private EditText mPasswordField;
@@ -36,53 +41,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_login);
 
         //Initialization of Firebase Objects
-        mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
 
         //Initialization of Email and Password EditTexts
         mEmailField = findViewById(R.id.emailEditText);
         mPasswordField = findViewById(R.id.passwordEditText);
 
 
-        //Check and warn if input fields are empty
-        mEmailField.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+        mEmailField.addTextChangedListener(emailWatcher);
+        mPasswordField.addTextChangedListener(passWatcher);
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (mEmailField.getText().toString().length() <= 0) {
-                    mEmailField.setError("Bu alan doldurulmalı");
-                } else {
-                    mEmailField.setError(null);
-                }
-            }
-        });
-
-        //Check and warn if input fields are empty
-        mPasswordField.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (mPasswordField.getText().toString().length() <= 0) {
-                    mPasswordField.setError("Bu alan doldurulmalı");
-                } else {
-                    mPasswordField.setError(null);
-                }
-            }
-        });
 
         //Buttons for login options
         findViewById(R.id.loginButton).setOnClickListener(this);
@@ -133,7 +102,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 // Sign in failed. If response is null the user canceled the
                 // sign-in flow using the back button. Otherwise check
                 // response.getError().getErrorCode() and handle the error.
-                if(response==null){return;}
+                if (response == null) {
+                    return;
+                }
                 //TODO exceptionHandle();
                 // ...
             }
@@ -145,9 +116,31 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void onClick(View v) {
         int logInType = v.getId();
+        String email = mEmailField.getText().toString();
+        String password = mPasswordField.getText().toString();
         switch (logInType) {
             case R.id.loginButton:
-                //TODO login()
+                mAuth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    // Sign in success, update UI with the signed-in user's information
+                                    Log.d(TAG, "signInWithEmail:success");
+                                    FirebaseUser user = mAuth.getCurrentUser();
+                                    updateUI(user);
+                                    goToProfilePage();
+                                } else {
+                                    // If sign in fails, display a message to the user.
+                                    Log.w(TAG, "signInWithEmail:failure", task.getException());
+                                    Toast.makeText(LoginActivity.this, "Giriş başarısız",
+                                            Toast.LENGTH_SHORT).show();
+                                    updateUI(null);
+                                }
+
+                                // ...
+                            }
+                        });
                 break;
             case R.id.googleSignInButton:
                 //ToDo googleSignIn();
@@ -156,7 +149,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 //ToDo facebookSignIn();
                 break;
             case R.id.signUpIntentButton:
+                mPasswordField.removeTextChangedListener(passWatcher);
+                mEmailField.removeTextChangedListener(emailWatcher);
                 Intent intentToSignUp = new Intent(LoginActivity.this, SignUpActivity.class);
+                finish();
                 startActivity(intentToSignUp);
         }
     }
@@ -168,12 +164,59 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             //Get user info from db
             db.collection("users").document(userUid).get();
             //TODO setProfile();
-        }else{return;}
+        } else {
+            return;
+        }
     }
-    /*
-    //Getters and Setters
-    public FirebaseAuth getmAuth() {
-        return mAuth;
+
+    public void goToProfilePage() {
+        Intent goToProfile = new Intent(this, MainActivity.class);
+        finish();
+        startActivity(goToProfile);
     }
-   */
+
+    //Check and warn if input fields are empty
+    TextWatcher emailWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            if (mEmailField.getText().toString().length() <= 0) {
+                mEmailField.setError("Bu alan doldurulmalı");
+            } else {
+                mEmailField.setError(null);
+            }
+        }
+    };
+
+    //Check and warn if input fields are empty
+    TextWatcher passWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            if (mPasswordField.getText().toString().length() <= 0) {
+                mPasswordField.setError("Bu alan doldurulmalı");
+            } else {
+                mPasswordField.setError(null);
+            }
+        }
+    };
+
 }

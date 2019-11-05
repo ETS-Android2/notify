@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <ScrollView
@@ -95,7 +96,7 @@
                 android:background="@drawable/fui_idp_button_background_facebook"
                 android:drawableLeft="@drawable/fui_ic_facebook_white_22dp"
                 android:drawablePadding="12dp"
-                android:text="Facebook ileiriş yap"
+                android:text="Facebook ile giriş yap"
                 android:textAlignment="center"
                 android:paddingHorizontal="20dp"
                 android:textAllCaps="false"
