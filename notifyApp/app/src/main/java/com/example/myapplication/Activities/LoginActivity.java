@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.example.myapplication.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,13 +13,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.myapplication.R;
+import com.example.myapplication.MyObjects.MyUser;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.Map;
 
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
@@ -31,6 +36,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     FirebaseAuth mAuth;
     FirebaseFirestore db;
     FirebaseUser user;
+    MyUser currentUser = new MyUser();
 
     private EditText mEmailField;
     private EditText mPasswordField;
@@ -58,34 +64,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         findViewById(R.id.googleSignInButton).setOnClickListener(this);
         findViewById(R.id.facebookSignInButton).setOnClickListener(this);
         findViewById(R.id.signUpIntentButton).setOnClickListener(this);
-
-
-
-        /*loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    if (mEmailField != null || mPasswordField != null) {
-                        SignInWithEmailAndPassword loginwEandP = new SignInWithEmailAndPassword(mEmailField, mPasswordField);
-                        loginwEandP.signIn();
-                    }
-                } catch (Exception e) {
-                    System.out.println("SignInWithEmailAndPassword failed.");
-                }
-            }
-        });
-        */
     }
-    /*
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser==null){return;}
-    }
-
-    */
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -162,8 +141,22 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         if (user != null) {
             String userUid = user.getUid();
             //Get user info from db
-            db.collection("users").document(userUid).get();
-            //TODO setProfile();
+            db.collection("users").document(userUid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot user = task.getResult();
+                        Map<String, Object> currentUserInfo = user.getData();
+
+                        currentUser.setEmail(currentUserInfo.get("email").toString());
+                        currentUser.setCompany(currentUserInfo.get("company").toString());
+                        currentUser.setName(currentUserInfo.get("name").toString());
+                        currentUser.setPhoneNumber(currentUserInfo.get("phoneNumber").toString());
+                        currentUser.setTitel(currentUserInfo.get("titel").toString());
+                        currentUser.setProfileImageUri(currentUserInfo.get("profileImage").toString());
+                    }
+                }
+            });
         } else {
             return;
         }
@@ -171,6 +164,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     public void goToProfilePage() {
         Intent goToProfile = new Intent(this, MainActivity.class);
+        goToProfile.putExtra("currentUser", currentUser);
         finish();
         startActivity(goToProfile);
     }

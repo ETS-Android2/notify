@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.example.myapplication.Lists;
 
 
 import android.os.Bundle;
@@ -8,10 +8,13 @@ import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 
-public class NewEventFragment extends Fragment {
+import com.example.myapplication.R;
 
 
-    public NewEventFragment() {
+public class EventsFragment extends Fragment {
+
+
+    public EventsFragment() {
         // Required empty public constructor
     }
 
@@ -20,7 +23,8 @@ public class NewEventFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_new_event, container, false);
+
+        return inflater.inflate(R.layout.fragment_events, container, false);
     }
 
 }

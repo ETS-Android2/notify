@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.example.myapplication.Calendar;
 
 
 import android.os.Bundle;
@@ -8,10 +8,11 @@ import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 
-public class ChatRoomListFragment extends Fragment {
+import com.example.myapplication.R;
 
+public class CalendarFragment extends Fragment {
 
-    public ChatRoomListFragment() {
+    public CalendarFragment() {
         // Required empty public constructor
     }
 
@@ -19,8 +20,11 @@ public class ChatRoomListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        getActivity().setTitle("Calendar");
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_chat_room_list, container, false);
+        return inflater.inflate(R.layout.fragment_calendar, container, false);
+
     }
 
 }

@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
-apply plugin: "androidx.navigation.safeargs"
 
 android {
     compileSdkVersion 28
@@ -21,7 +20,6 @@ android {
 }
 
 dependencies {
-    def nav_version = "2.1.0-alpha06"
     def suppor_version = "28.0.0"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -40,16 +38,26 @@ dependencies {
 
 
     //-- Database, cloud and auth (Firebase features)
-    implementation 'com.google.firebase:firebase-firestore:21.2.1'
+    implementation 'com.google.firebase:firebase-firestore:21.3.0'
     implementation 'com.google.firebase:firebase-auth:19.1.0'
     implementation 'com.google.firebase:firebase-database:19.2.0'
+    implementation 'com.google.firebase:firebase-storage:19.1.0'
     implementation 'com.firebaseui:firebase-ui-auth:4.3.1'
     implementation 'com.facebook.android:facebook-login:[5,6)'
+
+    //Google Map
+    implementation "com.google.android.gms:play-services-location:17.0.0"
+    implementation "com.google.android.gms:play-services-maps:17.0.0"
+    implementation 'com.google.android.libraries.places:places:2.0.0'
 
     //Image operations by SquareUp (OpenSource)
     implementation 'com.squareup.picasso:picasso:2.71828'
 
     implementation 'com.github.armcha:SpaceNavigationView:1.6.0'
 
+    //Map Search Bar Thanks to @Mancj
+    implementation 'com.github.mancj:MaterialSearchBar:0.8.1'
+
+    implementation 'com.google.code.gson:gson:2.8.5'
 
 }

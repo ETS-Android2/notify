@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.example.myapplication.Profile;
 
 
 import android.os.Bundle;
@@ -8,9 +8,12 @@ import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 
-public class CalendarFragment extends Fragment {
+import com.example.myapplication.R;
 
-    public CalendarFragment() {
+public class EventProfileFragment extends Fragment {
+
+
+    public EventProfileFragment() {
         // Required empty public constructor
     }
 
@@ -19,8 +22,7 @@ public class CalendarFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_calendar, container, false);
-
+        return inflater.inflate(R.layout.fragment_event_profile, container, false);
     }
 
 }
