@@ -1,4 +1,4 @@
-package com.example.myapplication.Activities;
+package com.example.myapplication.SingleActivitiy;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -9,34 +9,28 @@ import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.NavigationUI;
 
-import com.example.myapplication.Calendar.CalendarFragment;
-import com.example.myapplication.ChatRoom.ChatRoomListFragment;
-import com.example.myapplication.CreateNewEvent.NewEventDateFragment;
-import com.example.myapplication.Lists.UsersFragment;
-import com.example.myapplication.MyObjects.MyUser;
-import com.example.myapplication.Profile.UserProfileFragment;
 import com.example.myapplication.R;
+import com.example.myapplication.ViewModels.AuthViewModel;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.Map;
 
 import static com.example.myapplication.Constants.COARSE_LOCATION;
 import static com.example.myapplication.Constants.ERROR_DIALOG_REQUEST;
@@ -46,114 +40,47 @@ import static com.example.myapplication.Constants.PERMISSIONS_REQUEST_ENABLE_GPS
 
 public class MainActivity extends AppCompatActivity {
 
-    FirebaseAuth mAuth;
-    FirebaseFirestore db;
-    private FirebaseAuth.AuthStateListener mAuthStateListener;
-    BottomNavigationView bottomNavigationView;
     private static final String TAG = "Main Activity: ";
-    MyUser currentUser = new MyUser();
+
     private boolean mLocationPermissionGranted = false;
     private FusedLocationProviderClient mFusedLocationClient;
+    private FirebaseAuth firebaseAuth;
+    private NavController navController;
+    private AuthViewModel authViewModel;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        firebaseAuth = FirebaseAuth.getInstance();
 
+        navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        final BottomNavigationView bottomNav = findViewById(R.id.bottom_nav);
+        NavigationUI.setupWithNavController(bottomNav, navController);
 
+        authViewModel = ViewModelProviders.of(this).get(AuthViewModel.class);
+        authViewModel.AuthViewModel();
 
-        mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        bottomNavigationView = findViewById(R.id.bottom_nav);
-        bottomNavigationView.setOnNavigationItemSelectedListener(navListener);
-        bottomNavigationView.setSelectedItemId(R.id.userProfile);
 
-        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
+        navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
             @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (mAuth.getCurrentUser() != null) {
-                    db.collection("users").document(mAuth.getCurrentUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful()) {
-                                DocumentSnapshot user = task.getResult();
-                                Map<String, Object> currentUserInfo = user.getData();
-
-                                currentUser.setEmail(currentUserInfo.get("email").toString());
-                                currentUser.setCompany(currentUserInfo.get("company").toString());
-                                currentUser.setName(currentUserInfo.get("name").toString());
-                                currentUser.setPhoneNumber(currentUserInfo.get("phoneNumber").toString());
-                                currentUser.setTitel(currentUserInfo.get("titel").toString());
-                                if (currentUserInfo.get("profileImage") != null) {
-                                    currentUser.setProfileImageUri(currentUserInfo.get("profileImage").toString());
-                                } else {
-                                    currentUser.setProfileImageUri(null);
-                                }
-                            }
-                        }
-                    });
-                    bottomNavigationView.setSelectedItemId(R.id.userProfile);
-                } else if (mAuth.getCurrentUser() == null) {
-                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            public void onDestinationChanged(@NonNull NavController controller, @NonNull NavDestination destination, @Nullable Bundle arguments) {
+                if (destination.getId() == R.id.signUpFragment || destination.getId() == R.id.loginFragment) {
+                    bottomNav.setVisibility(View.GONE);
+                } else {
+                    bottomNav.setVisibility(View.VISIBLE);
                 }
             }
-
-        };
+        });
 
     }
-
-
-
-    private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-            Fragment selectedFragment = null;
-            getIntent().putExtra("currentUser", currentUser);
-            switch (menuItem.getItemId()) {
-                case R.id.eventList:
-                    selectedFragment = new UsersFragment();
-                    menuItem.setChecked(true);
-                    break;
-                case R.id.chatRoom:
-                    selectedFragment = new ChatRoomListFragment();
-                    menuItem.setChecked(true);
-                    break;
-                case R.id.newEvent:
-                    if (checkMapServices()) {
-                        if (mLocationPermissionGranted) {
-                            selectedFragment = new NewEventDateFragment();
-                            menuItem.setChecked(true);
-                        } else {
-                            getLocationPermission();
-                        }
-                    }
-                    break;
-                case R.id.userProfile:
-                    selectedFragment = new UserProfileFragment();
-                    menuItem.setChecked(true);
-                    break;
-                case R.id.calendar:
-                    selectedFragment = new CalendarFragment();
-                    menuItem.setChecked(true);
-                    break;
-                default:
-                    selectedFragment = new UserProfileFragment();
-                    break;
-            }
-
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commitAllowingStateLoss();
-            return false;
-        }
-    };
 
 
     @Override
     protected void onStart() {
         super.onStart();
-        mAuth.addAuthStateListener(mAuthStateListener);
-
     }
 
     @Override
@@ -283,5 +210,5 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-
 }
+

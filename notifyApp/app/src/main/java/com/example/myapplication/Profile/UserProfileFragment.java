@@ -5,19 +5,21 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.Navigation;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.myapplication.Adapters.AdapderEventCard;
@@ -25,20 +27,12 @@ import com.example.myapplication.ImageOperations.PicassoCircleTransformation;
 import com.example.myapplication.MyObjects.MyEvent;
 import com.example.myapplication.MyObjects.MyUser;
 import com.example.myapplication.R;
+import com.example.myapplication.ViewModels.AuthViewModel;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -57,11 +51,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     private TextView titelProfile;
     private TextView companyProfile;
     private static final int PICK_IMAGE_REQUEST = 1;
-    private StorageReference storageReference;
-    private DatabaseReference databaseReference;
-    private StorageReference gsReference;
-    private ProgressBar progressBar;
-    private FirebaseAuth mAuth;
+
     private SimpleDateFormat formatter;
     private MyUser currentUser;
 
@@ -69,7 +59,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     private AdapderEventCard adapderEventCard;
     private List<MyEvent> eventList;
 
-
+    private AuthViewModel viewModel;
 
 
     private static final String TAG = "UserProfile Fragment: ";
@@ -86,14 +76,14 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         //Inflate fragment layout
         getActivity().setTitle("Profile");
 
-        View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        final View view = inflater.inflate(R.layout.fragment_profile, container, false);
+
         formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         userProfileImg = view.findViewById(R.id.user_profile_img);
         usernameProfile = view.findViewById(R.id.profile_username);
         titelProfile = view.findViewById(R.id.profile_titel);
         companyProfile = view.findViewById(R.id.profile_company);
         userProfileImg.setOnClickListener(this);
-        progressBar = new ProgressBar(getActivity());
 
         //Init list & adapter
         eventList = new ArrayList<>();
@@ -101,24 +91,38 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         adapderEventCard = new AdapderEventCard(eventList, getActivity());
         viewPager = view.findViewById(R.id.event_cards_on_profile);
         viewPager.setAdapter(adapderEventCard);
-        viewPager.setPadding(130,0,130,0);
+        viewPager.setPadding(130, 0, 130, 0);
 
-        //Init db
-        db = FirebaseFirestore.getInstance();
-        storageReference = FirebaseStorage.getInstance().getReference("UserProfileImages");
-        databaseReference = FirebaseDatabase.getInstance().getReference("UserProfileImages");
-        mAuth = FirebaseAuth.getInstance();
+        viewModel = ViewModelProviders.of(requireActivity()).get(AuthViewModel.class);
+        viewModel.AuthViewModel();
 
-        //Get current user
-        Intent fromMainToFragment = getActivity().getIntent();
-        currentUser = (MyUser) fromMainToFragment.getSerializableExtra("currentUser");
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(),
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        //Login cancelled
+                        //TODO Maybe implemented
+                        if (!Navigation.findNavController(view).popBackStack()) {
+                            getActivity().finish();
+                        }
+                    }
+                });
 
-
-        //Update UI
-        setUserDataToUI();
         return view;
     }
 
+
+    @Override
+    public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if (viewModel.isLoggedIn()) {
+            setUserDataToUI();
+            Log.e(TAG, "setUserDataUI called");
+        } else {
+
+            Navigation.findNavController(view).navigate(R.id.to_loginNav);
+        }
+    }
 
     private void chooseImage() {
         Intent intent = new Intent();
@@ -152,52 +156,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
 
     private void uploadImg() {
         if (imageUri != null) {
-            final String fbStoragePath = mAuth.getUid() + "." + getFileExtention(imageUri);
-            final StorageReference fileReference = storageReference.child(fbStoragePath);
-            fileReference.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            progressBar.setProgress(0);
-                        }
-                    }, 500);
-                    Log.w(TAG, "Upload successful");
-
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.w(TAG, e.getMessage());
-                }
-            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                    double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                    progressBar.setProgress((int) progress);
-                }
-            });
-            fileReference.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-                @Override
-                public void onComplete(@NonNull Task<Uri> task) {
-                    Uri imgDownloadUri = task.getResult();
-                    db.collection("users").document(mAuth.getUid()).update("profileImage", imgDownloadUri.toString())
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Log.w(TAG, "Upload saved");
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.w(TAG, "Failure on upload", e);
-                        }
-                    });
-                    currentUser.setProfileImageUri(imgDownloadUri.toString());
-                }
-            });
+            viewModel.uploadProfileImage(imageUri,currentUser,getFileExtention(imageUri));
         } else {
             Log.w(TAG, "No file selected");
         }
@@ -242,18 +201,27 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         }
     }
 
-    private void setUserDataToUI(){
-        usernameProfile.setText(currentUser.getName());
-        titelProfile.setText(currentUser.getTitel());
-        companyProfile.setText(currentUser.getCompany());
-        try{
+    //Get authenticated user data from the viewModel and update UI according to that data
+    private void setUserDataToUI() {
+        viewModel.getAuthenticatedUser().observe(this, new Observer<MyUser>() {
+            @Override
+            public void onChanged(MyUser myUser) {
+                if (myUser != null) {
+                    currentUser = myUser;
+                    usernameProfile.setText(myUser.getName());
+                    titelProfile.setText(myUser.getTitel());
+                    companyProfile.setText(myUser.getCompany());
+                    try {
+                        Picasso.get().load(myUser.getProfileImageUri()).transform(new PicassoCircleTransformation()).placeholder(R.mipmap.ic_launcher)
+                                .error(R.mipmap.ic_launcher).into(userProfileImg);
+                        Log.w(TAG, "Profile image is set from Cloud");
+                    } catch (Exception e) {
+                        Log.w(TAG, e.getMessage());
+                    }
 
-            Picasso.get().load(currentUser.getProfileImageUri()).transform(new PicassoCircleTransformation()).placeholder(R.mipmap.ic_launcher)
-                    .error(R.mipmap.ic_launcher).into(userProfileImg);
-            Log.w(TAG, "Profile image is set from Cloud");
-        }catch (Exception e){
-            Log.w(TAG, e.getMessage());
-        }
-
+                }
+            }
+        });
     }
+
 }
