@@ -24,8 +24,8 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.example.myapplication.Adapters.AdapderEventCard;
 import com.example.myapplication.ImageOperations.PicassoCircleTransformation;
-import com.example.myapplication.MyObjects.MyEvent;
-import com.example.myapplication.MyObjects.MyUser;
+import com.example.myapplication.Models.MyEvent;
+import com.example.myapplication.Models.MyUser;
 import com.example.myapplication.R;
 import com.example.myapplication.ViewModels.AuthViewModel;
 import com.google.android.gms.tasks.OnCompleteListener;
