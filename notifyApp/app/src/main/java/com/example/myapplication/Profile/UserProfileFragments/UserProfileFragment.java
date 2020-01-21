@@ -1,4 +1,4 @@
-package com.example.myapplication.Profile;
+package com.example.myapplication.Profile.UserProfileFragments;
 
 
 import android.content.ContentResolver;
@@ -22,29 +22,18 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 import androidx.viewpager.widget.ViewPager;
 
-import com.example.myapplication.Adapters.AdapderEventCard;
-import com.example.myapplication.ImageOperations.PicassoCircleTransformation;
-import com.example.myapplication.Models.MyEvent;
+import com.example.myapplication.Adapters.AdapterViewPagerUserProfile;
 import com.example.myapplication.Models.MyUser;
 import com.example.myapplication.R;
 import com.example.myapplication.ViewModels.AuthViewModel;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.example.myapplication.ViewModels.EventViewModel;
+import com.google.android.material.tabs.TabLayout;
 import com.squareup.picasso.Picasso;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
 
 public class UserProfileFragment extends Fragment implements View.OnClickListener {
 
-    FirebaseFirestore db;
     private Uri imageUri;
     private ImageView userProfileImg;
     private TextView usernameProfile;
@@ -52,14 +41,15 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     private TextView companyProfile;
     private static final int PICK_IMAGE_REQUEST = 1;
 
-    private SimpleDateFormat formatter;
     private MyUser currentUser;
 
-    private ViewPager viewPager;
-    private AdapderEventCard adapderEventCard;
-    private List<MyEvent> eventList;
+    private AuthViewModel authViewModel;
+    private EventViewModel eventViewModel;
 
-    private AuthViewModel viewModel;
+
+    private TabLayout tabLayout;
+    private AdapterViewPagerUserProfile adapterViewPager;
+    private ViewPager viewPager;
 
 
     private static final String TAG = "UserProfile Fragment: ";
@@ -68,6 +58,11 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         // Required empty public constructor
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -78,23 +73,52 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
 
         final View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
-        formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         userProfileImg = view.findViewById(R.id.user_profile_img);
         usernameProfile = view.findViewById(R.id.profile_username);
         titelProfile = view.findViewById(R.id.profile_titel);
         companyProfile = view.findViewById(R.id.profile_company);
-        userProfileImg.setOnClickListener(this);
 
-        //Init list & adapter
-        eventList = new ArrayList<>();
-        //TODO Get events from DB
-        adapderEventCard = new AdapderEventCard(eventList, getActivity());
-        viewPager = view.findViewById(R.id.event_cards_on_profile);
-        viewPager.setAdapter(adapderEventCard);
-        viewPager.setPadding(130, 0, 130, 0);
 
-        viewModel = ViewModelProviders.of(requireActivity()).get(AuthViewModel.class);
-        viewModel.AuthViewModel();
+        authViewModel = ViewModelProviders.of(requireActivity()).get(AuthViewModel.class);
+        authViewModel.AuthViewModel();
+
+        eventViewModel = ViewModelProviders.of(requireActivity()).get(EventViewModel.class);
+        eventViewModel.EventViewModel();
+
+        if (authViewModel.isLoggedIn()) {
+            setUserDataToUI();
+            Log.e(TAG, "setUserDataUI called");
+        } else {
+            Navigation.findNavController(view).navigate(R.id.to_loginNav);
+        }
+
+        String userID = authViewModel.getAuthUser().getValue().getUid();
+        tabLayout = view.findViewById(R.id.profile_tablayout);
+        viewPager = view.findViewById(R.id.profile_viewpager);
+
+        //Init adapter if its not in savedState
+        if(adapterViewPager == null) {
+            adapterViewPager = new AdapterViewPagerUserProfile(getChildFragmentManager(), AdapterViewPagerUserProfile.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+
+            MyEventsList myEventsList = new MyEventsList();
+            ParticipatedEventsList participatedEventsList = new ParticipatedEventsList();
+            ProfileSettingsFragment profileSettingsFragment = new ProfileSettingsFragment();
+
+            adapterViewPager.addFragment(myEventsList, "My Events");
+            eventViewModel.fetchEvents(myEventsList, userID);
+            Log.e(TAG, "BURASIII!!!: " + adapterViewPager.getCount());
+            adapterViewPager.addFragment(participatedEventsList, "Participated Events");
+            eventViewModel.fetchEvents(participatedEventsList, userID);
+
+            adapterViewPager.addFragment(profileSettingsFragment, "Settings");
+        }
+            Log.e(TAG, "BURASIII!!!: "+ adapterViewPager.getCount());
+
+        //setOffScreenPageLimit solved problem about disappearing fragment content in ViewPager
+        viewPager.setOffscreenPageLimit(2);
+
+        viewPager.setAdapter(adapterViewPager);
+        tabLayout.setupWithViewPager(viewPager);
 
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(),
                 new OnBackPressedCallback(true) {
@@ -115,13 +139,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (viewModel.isLoggedIn()) {
-            setUserDataToUI();
-            Log.e(TAG, "setUserDataUI called");
-        } else {
 
-            Navigation.findNavController(view).navigate(R.id.to_loginNav);
-        }
     }
 
     private void chooseImage() {
@@ -139,7 +157,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
 
             imageUri = data.getData();
             //TODO controlImgSize();
-            Picasso.get().load(imageUri.toString()).transform(new PicassoCircleTransformation()).into(userProfileImg);
+            Picasso.get().load(imageUri.toString()).into(userProfileImg);
             Log.w(TAG, "User Profile Image is selected");
             uploadImg();
         } else {
@@ -156,43 +174,13 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
 
     private void uploadImg() {
         if (imageUri != null) {
-            viewModel.uploadProfileImage(imageUri,currentUser,getFileExtention(imageUri));
+            authViewModel.uploadProfileImage(imageUri, currentUser, getFileExtention(imageUri));
         } else {
             Log.w(TAG, "No file selected");
         }
 
     }
 
-    private void getEvents() {
-
-        //TODO checkHERE!!!!!
-        //Get all users from db
-        db.collection("users").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                eventList.clear();
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot user : task.getResult()) {
-                        //Pars collected data(users) into instances
-                        Map<String, Object> eventDataOnUserProfile = user.getData();
-                        MyEvent singleEvent = new MyEvent();
-                        singleEvent.setEventName(eventDataOnUserProfile.get("eventName").toString());
-                        //singleEvent.setEventDate((Date) eventDataOnUserProfile.get("eventDate").toString());
-                        //TODO splitAndSetEventDate
-                        singleEvent.setThumbnail(eventDataOnUserProfile.get("thumbnail").toString());
-                        //Add user to the list
-                        eventList.add(singleEvent);
-
-                    }
-                } else {
-                    //If task has failed
-                    Log.w(TAG, "Database problem on loading event grid layout");
-                }
-            }
-
-        });
-
-    }
 
     @Override
     public void onClick(View v) {
@@ -201,9 +189,9 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
         }
     }
 
-    //Get authenticated user data from the viewModel and update UI according to that data
+    //Get authenticated user data from the authViewModel and update UI according to that data
     private void setUserDataToUI() {
-        viewModel.getAuthenticatedUser().observe(this, new Observer<MyUser>() {
+        authViewModel.getAuthenticatedUser().observe(this, new Observer<MyUser>() {
             @Override
             public void onChanged(MyUser myUser) {
                 if (myUser != null) {
@@ -212,7 +200,7 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
                     titelProfile.setText(myUser.getTitel());
                     companyProfile.setText(myUser.getCompany());
                     try {
-                        Picasso.get().load(myUser.getProfileImageUri()).transform(new PicassoCircleTransformation()).placeholder(R.mipmap.ic_launcher)
+                        Picasso.get().load(myUser.getProfileImage()).placeholder(R.mipmap.ic_launcher)
                                 .error(R.mipmap.ic_launcher).into(userProfileImg);
                         Log.w(TAG, "Profile image is set from Cloud");
                     } catch (Exception e) {
@@ -223,5 +211,6 @@ public class UserProfileFragment extends Fragment implements View.OnClickListene
             }
         });
     }
+
 
 }

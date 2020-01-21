@@ -1,91 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Profile.UserProfileFragment">
-
+    tools:context=".Profile.UserProfileFragments.UserProfileFragment">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="#272626"
-        android:padding="20dp"
-        android:id="@+id/profileHeader">
 
-        <RelativeLayout
+        <LinearLayout
+            android:id="@+id/profileHeader"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="250dp"
+            android:background="@drawable/black_gradient"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/user_profile_img"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerHorizontal="true"
+                    android:foreground="@drawable/black_gradient"
+                    android:scaleType="centerCrop" />
 
 
-            <ImageView
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:layout_centerHorizontal="true"
-                android:id="@+id/user_profile_img"/>
+                <ImageButton
+                    android:id="@+id/ic_settings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginRight="16dp"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_settings_white_40dp" />
 
-            <ImageButton
-                android:id="@+id/ic_settings"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentRight="true"
-                android:background="@android:color/transparent"
-                android:src="@drawable/ic_settings_white_40dp" />
-        </RelativeLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginStart="16dp"
+                    android:orientation="vertical"
+                    android:paddingBottom="70dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Username"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:fontFamily="@font/open_sans_light"
-            android:layout_gravity="center_horizontal"
-            android:textColor="@android:color/white"
-            android:id="@+id/profile_username"
-            android:layout_marginTop="5dp"/>
+                    <TextView
+                        android:id="@+id/profile_username"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_above="@id/profile_titel"
+                        android:layout_marginTop="5dp"
+                        android:fontFamily="@font/open_sans_light"
+                        android:text="Username"
+                        android:textColor="@android:color/white"
+                        android:textSize="28sp"
+                        android:textStyle="bold" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Titel"
-            android:textSize="20sp"
-            android:fontFamily="@font/open_sans_light"
-            android:layout_gravity="center_horizontal"
-            android:textColor="@android:color/tertiary_text_light"
-            android:id="@+id/profile_titel"/>
+                    <TextView
+                        android:id="@+id/profile_titel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_above="@id/profile_company"
+                        android:fontFamily="@font/open_sans_light"
+                        android:text="Titel"
+                        android:textColor="@android:color/tertiary_text_light"
+                        android:textSize="20sp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Company"
-            android:textSize="20sp"
-            android:fontFamily="@font/open_sans_light"
-            android:layout_gravity="center_horizontal"
-            android:textColor="@android:color/tertiary_text_light"
-            android:id="@+id/profile_company"/>
-    </LinearLayout>
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/profileHeader">
-
-
-        <androidx.viewpager.widget.ViewPager
+                    <TextView
+                        android:id="@+id/profile_company"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:fontFamily="@font/open_sans_light"
+                        android:text="Company"
+                        android:textColor="@android:color/tertiary_text_light"
+                        android:textSize="20sp" />
+                </LinearLayout>
+            </RelativeLayout>
+        </LinearLayout>
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:foregroundGravity="center"
-            android:layout_centerInParent="true"
-            android:id="@+id/event_cards_on_profile"
-            android:overScrollMode="never"
-            android:clipToPadding="false"/>
+            android:background="@android:color/white"
+            android:layout_below="@id/profileHeader"
+            android:layout_marginTop="-30dp"
+            android:paddingBottom="30dp"
+            app:cardCornerRadius="30dp"
+            android:layout_marginBottom="-30dp"
+            android:layout_alignParentBottom="true">
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/profile_tablayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="16dp"
+                    android:background="@android:color/transparent"
+                    app:tabGravity="fill"
+                    app:tabMode="fixed"
+                    app:tabSelectedTextColor="#21C064" />
+
+                <androidx.viewpager.widget.ViewPager
+                    android:id="@+id/profile_viewpager"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@id/profile_tablayout" />
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
     </RelativeLayout>
-
-    </RelativeLayout>
-
 </FrameLayout>

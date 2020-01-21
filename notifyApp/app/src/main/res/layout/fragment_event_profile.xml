@@ -1,14 +1,243 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Profile.EventProfileFragment">
+    tools:context=".Profile.UserProfileFragments.UserProfileFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="match_parent">
 
+
+        <RelativeLayout
+            android:id="@+id/profileHeader"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="@drawable/black_gradient">
+
+
+            <ImageView
+                android:id="@+id/event_profile_img"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop" />
+
+
+        </RelativeLayout>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/profile_event_card"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/profileHeader"
+            android:layout_marginTop="-30dp"
+            android:layout_marginBottom="-30dp"
+            android:background="@android:color/white"
+            android:paddingBottom="30dp"
+            app:cardCornerRadius="30dp">
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginHorizontal="36dp"
+                        android:orientation="vertical">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:id="@+id/profile_eventname"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="24dp"
+                                android:fontFamily="@font/open_sans_light"
+                                android:text="Event Name"
+                                android:textColor="@android:color/black"
+                                android:textSize="24sp"
+                                android:textStyle="bold" />
+
+                            <ImageButton
+                                android:id="@+id/event_profile_settings"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentTop="true"
+                                android:layout_alignParentRight="true"
+                                android:layout_marginTop="16dp"
+                                android:background="@android:color/transparent"
+                                android:src="@drawable/ic_settings_white_40dp" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1">
+
+
+                            </LinearLayout>
+                        </RelativeLayout>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="20dp"
+                            android:fontFamily="@font/open_sans_light"
+                            android:text="Description"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/event_profile_desc"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/open_sans_light"
+                            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque molestie, lorem eget dictum facilisis, elit leo tempor quam, ultrices eleifend risus arcu sit amet dui. Vestibulum in elit egestas, semper felis ut, porta quam. Etiam ultrices et tortor non vulputate. Nullam interdum sollicitudin ipsum non accumsan."
+                            android:textSize="16sp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/date_title"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/open_sans_light"
+                                    android:text="Date"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/event_profile_date"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/open_sans_light"
+                                    android:text="xx/xx/xxxx"
+                                    android:textSize="20sp" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/time_title"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/open_sans_light"
+                                    android:text="Time"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/event_profile_time"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/open_sans_light"
+                                    android:text="00:00"
+                                    android:textSize="20sp" />
+
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:fontFamily="@font/open_sans_light"
+                            android:text="Place"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/event_profile_placename"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:drawableEnd="@drawable/ic_arrow_right_light"
+                            android:drawablePadding="16dp"
+                            android:fontFamily="@font/open_sans_light"
+                            android:text="Place Name"
+                            android:textSize="20sp" />
+
+                        <TextView
+                            android:id="@+id/event_profile_partnum"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:fontFamily="@font/open_sans_light"
+                            android:text="xx Participans"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/event_profile_friendsnum"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:drawableEnd="@drawable/ic_arrow_right_light"
+                            android:drawablePadding="16dp"
+                            android:fontFamily="@font/open_sans_light"
+                            android:text="xx friends in there, see all"
+                            android:textSize="20sp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:fontFamily="@font/open_sans_light"
+                            android:text="Gallery"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/event_profile_gallery"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:drawableEnd="@drawable/ic_arrow_right_light"
+                            android:drawablePadding="16dp"
+                            android:fontFamily="@font/open_sans_light"
+                            android:text="xx photos, see all"
+                            android:textSize="20sp" />
+
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+            </ScrollView>
+        </androidx.cardview.widget.CardView>
+
+        <Button
+            android:id="@+id/event_profile_join"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="36dp"
+            android:background="@drawable/rounded_button"
+            android:elevation="8dp"
+            android:paddingHorizontal="20dp"
+            android:text="Join"
+            android:textAllCaps="false"
+            android:layout_marginBottom="16dp"/>
+    </RelativeLayout>
 </FrameLayout>

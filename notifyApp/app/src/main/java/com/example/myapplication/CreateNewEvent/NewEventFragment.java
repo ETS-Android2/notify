@@ -125,7 +125,7 @@ public class NewEventFragment extends Fragment implements DatePickerDialog.OnDat
                     }
                     newEvent.setEventPlaceID(place_id);
                     newEvent.setEventPlaceName(receivedLocationName);
-                    newEvent.setOrganisatorRef(eventViewModel.getOrganisatorReference(authUid));
+                    newEvent.setOrganisatorID(authUid);
                     newEvent.setHidden(event_hide.isChecked());
                     MyEvent createdEvent = eventViewModel.createEvent(newEvent, imageUri, getFileExtention(imageUri)).getValue();
                     if (createdEvent != null) {
