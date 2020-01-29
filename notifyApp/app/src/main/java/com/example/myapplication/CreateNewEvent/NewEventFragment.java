@@ -5,8 +5,9 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -26,9 +27,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.example.myapplication.ImageOperations.PicassoCircleTransformation;
@@ -43,16 +45,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 
 import static android.app.Activity.RESULT_OK;
+import static com.example.myapplication.Constants.PICK_IMAGE_REQUEST;
 
-public class NewEventFragment extends Fragment implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
+public class NewEventFragment extends Fragment implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener, View.OnClickListener {
 
-    //Constants
     private static final String TAG = "NewEventFragment: ";
-    private static final int PICK_IMAGE_REQUEST = 1;
-
 
     //Views
     private Button nextEventCreateButton;
@@ -73,14 +72,20 @@ public class NewEventFragment extends Fragment implements DatePickerDialog.OnDat
 
     //Received info from our custom location picker
     private String place_id;
-    private String receivedLocationName;
 
     //Form validator
-    private int filledFieldCount;
+    private boolean isNameFilled = false;
+    private boolean isDescFilled = false;
+    private boolean isLocSelected = false;
+    private boolean isDateSelected = false;
+    private boolean isTimeSelected = false;
+    private boolean isImgSelected = false;
 
     //ViewModels for data binding
     private AuthViewModel authViewModel;
     private EventViewModel eventViewModel;
+
+    private NavController navController;
 
     public NewEventFragment() {
         // Required empty public constructor
@@ -93,49 +98,15 @@ public class NewEventFragment extends Fragment implements DatePickerDialog.OnDat
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_new_event, container, false);
 
+        //Init viewModels
         authViewModel = ViewModelProviders.of(requireActivity()).get(AuthViewModel.class);
         authViewModel.AuthViewModel();
 
         eventViewModel = ViewModelProviders.of(requireActivity()).get(EventViewModel.class);
         eventViewModel.EventViewModel();
 
+        //Init empty new event
         newEvent = new MyEvent();
-
-        filledFieldCount = 0;
-        nextEventCreateButton = view.findViewById(R.id.submit_event_btn);
-        nextEventCreateButton.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            public void onClick(View v) {
-                if (isFieldsFilled()) {
-
-                    newEvent.setEventName(event_name.getText().toString());
-                    newEvent.setEventDescription(event_desc.getText().toString());
-                    String authUid = authViewModel.getAuthUser().getValue().getUid();
-                    SimpleDateFormat isoFormat = new SimpleDateFormat("dd-MM-yyyy'T'HH:mm");
-                    isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                    try {
-                        Date selectedDate = isoFormat.parse(dateText + "T" + timeText);
-                        Log.i(TAG, "Parsed event date: " + selectedDate.toString());
-                        Timestamp timestamp = new Timestamp(selectedDate);
-                        Log.i(TAG, "Created Timestamp for event: " + timestamp.toString());
-                        newEvent.setEventDateAndTime(timestamp);
-                    } catch (ParseException e) {
-                        Log.e(TAG, e.getMessage());
-                    }
-                    newEvent.setEventPlaceID(place_id);
-                    newEvent.setEventPlaceName(receivedLocationName);
-                    newEvent.setOrganisatorID(authUid);
-                    newEvent.setHidden(event_hide.isChecked());
-                    MyEvent createdEvent = eventViewModel.createEvent(newEvent, imageUri, getFileExtention(imageUri)).getValue();
-                    if (createdEvent != null) {
-                        Toast.makeText(getActivity(), "Event created", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getActivity(), "Failed to create event", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-        });
 
         getActivity().setTitle("New event");
 
@@ -157,9 +128,10 @@ public class NewEventFragment extends Fragment implements DatePickerDialog.OnDat
             public void afterTextChanged(Editable s) {
                 if (event_name.getText().toString().length() <= 0) {
                     event_name.setError("Bu alan doldurulmalı");
+                    isNameFilled = false;
                 } else {
                     event_name.setError(null);
-                    filledFieldCount++;
+                    isNameFilled = true;
                 }
             }
         });
@@ -181,88 +153,97 @@ public class NewEventFragment extends Fragment implements DatePickerDialog.OnDat
             public void afterTextChanged(Editable s) {
                 if (event_desc.getText().toString().length() <= 0) {
                     event_desc.setError("Bu alan doldurulmalı");
+                    isDescFilled = false;
                 } else {
                     event_desc.setError(null);
-                    filledFieldCount++;
+                    isDescFilled = true;
                 }
             }
         });
 
+        //Init buttons
+        nextEventCreateButton = view.findViewById(R.id.submit_event_btn);
+        nextEventCreateButton.setOnClickListener(this);
+
         event_img = view.findViewById(R.id.new_event_img);
-        event_img.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                chooseImage();
-            }
-        });
+        event_img.setOnClickListener(this);
 
-        //Select date
         event_date = view.findViewById(R.id.new_event_date_picker);
-        event_date.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDatePickerDialog();
-            }
-        });
+        event_date.setOnClickListener(this);
 
-        //Select time
         event_time = view.findViewById(R.id.new_event_time_picker);
-        event_time.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showTimePickerDialog();
-            }
-        });
+        event_time.setOnClickListener(this);
 
-        //Select location
         event_loc = view.findViewById(R.id.new_event_loc_picker);
-        event_loc.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Navigation.findNavController(v).navigate(NewEventFragmentDirections.toNewEventMapFragment());
-            }
-        });
+        event_loc.setOnClickListener(this);
 
-        //Is event hidden
         event_hide = view.findViewById(R.id.new_event_is_hidden);
+
+        //If date is not selected
+        if (event_date.getText().toString().equals("DD-MM-YYYY")) {
+            isDateSelected = false;
+        }
+        //If date is not selected
+        if (!event_time.getText().toString().equals("HH:MM")) {
+            isTimeSelected = false;
+        }
 
         return view;
     }
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        //Event place selected
-        place_id = NewEventFragmentArgs.fromBundle(getArguments()).getPlaceId();
-        receivedLocationName = NewEventFragmentArgs.fromBundle(getArguments()).getPlaceName();
-        if (receivedLocationName != null) {
-            event_loc.setText(receivedLocationName);
-            filledFieldCount++;
-        }
+        navController = Navigation.findNavController(view);
+
+        //Share an event to update it from mapFragment
+        eventViewModel.getSharedInstance().observe(getViewLifecycleOwner(), new Observer<MyEvent>() {
+            @Override
+            public void onChanged(MyEvent myEvent) {
+                //Get event on update
+                newEvent = myEvent;
+                setEventDataToUI(myEvent);
+            }
+        });
     }
 
-    //Date selected
+    //Get selected date
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        dateText = dayOfMonth + "-" + (month + 1) + "-" + year;
+        month++;
+        String tempMonth;
+        String tempDay;
+        if (month < 10) {
+            tempMonth = "0" + month;
+        } else {
+            tempMonth = String.valueOf(month);
+        }
+        if (dayOfMonth < 10) {
+            tempDay = "0" + dayOfMonth;
+        } else {
+            tempDay = String.valueOf(dayOfMonth);
+        }
+        dateText = tempDay + "-" + tempMonth + "-" + year;
         Date today = Calendar.getInstance().getTime();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
         try {
             Date selectedDate = sdf.parse(dateText);
             //Check if selected date is earlier than today
             if (selectedDate.before(today)) {
                 Toast.makeText(getActivity(), "Event date can't be in the past", Toast.LENGTH_SHORT).show();
+                isDateSelected = false;
             } else {
                 event_date.setText(dateText);
-                filledFieldCount++;
+                isDateSelected = true;
             }
         } catch (ParseException e) {
             Log.e(TAG, e.getMessage());
         }
     }
 
-    //Time selected
+    //Get selected time
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         String hour;
@@ -273,20 +254,11 @@ public class NewEventFragment extends Fragment implements DatePickerDialog.OnDat
         }
         timeText = hour + ":" + minute;
         event_time.setText(timeText);
-        filledFieldCount++;
+        isTimeSelected = true;
     }
 
-    private boolean isFieldsFilled() {
-        if (filledFieldCount >= 5) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    //TODO doTheWork();
 
-
-    //Show time and date picker
+    //Show time picker
     private void showTimePickerDialog() {
         TimePickerDialog timePicker = new TimePickerDialog(
                 getActivity(),
@@ -298,6 +270,7 @@ public class NewEventFragment extends Fragment implements DatePickerDialog.OnDat
         timePicker.show();
     }
 
+    //Show date picker
     private void showDatePickerDialog() {
         DatePickerDialog datePicker = new DatePickerDialog(
                 getActivity(),
@@ -308,6 +281,7 @@ public class NewEventFragment extends Fragment implements DatePickerDialog.OnDat
         datePicker.show();
     }
 
+    //Choose image from gallery
     private void chooseImage() {
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -315,21 +289,23 @@ public class NewEventFragment extends Fragment implements DatePickerDialog.OnDat
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
-    @Override
+    @Override   //Get gallery result (Only one image)
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        //Image size is not controlled!
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             imageUri = data.getData();
             //TODO controlImgSize();
             Picasso.get().load(imageUri.toString()).transform(new PicassoCircleTransformation()).into(event_img);
+            isImgSelected = true;
             Log.w(TAG, "Event main image is selected");
         } else {
             Log.w(TAG, "Event main image is not selected");
+            isImgSelected = false;
         }
     }
 
-
+    //Get file extention (expected jpg)
     private String getFileExtention(Uri uri) {
         if (uri != null) {
             ContentResolver cR = getContext().getContentResolver();
@@ -337,6 +313,164 @@ public class NewEventFragment extends Fragment implements DatePickerDialog.OnDat
             return mime.getExtensionFromMimeType(cR.getType(uri));
         } else {
             return null;
+        }
+    }
+
+    private MyEvent createEventInstance() {
+        //Fill empty event and create an instance
+        MyEvent tempEvent = new MyEvent();
+        if (event_name.getText() != null || event_name.getText().length() != 0) {
+            tempEvent.setEventName(event_name.getText().toString());
+        }
+        if (event_desc.getText() != null || event_desc.getText().length() != 0) {
+            tempEvent.setEventDescription(event_desc.getText().toString());
+        }
+        tempEvent.setHidden(event_hide.isSelected());
+        if (isDateSelected || isTimeSelected) {
+            if (isDateSelected) {
+                dateText = event_date.getText().toString();
+            }
+            if (isTimeSelected) {
+                timeText = event_time.getText().toString();
+            }
+        }
+        Timestamp timestamp = createTimestamp(dateText, timeText);
+        if (timestamp != null) {
+            tempEvent.setEventDateAndTime(timestamp);
+        }
+        if (isImgSelected) {
+            BitmapDrawable drawable = (BitmapDrawable) event_img.getDrawable();
+            Bitmap bitmap = drawable.getBitmap();
+            tempEvent.setEventImg(bitmap);
+        }
+        if (place_id != null) {
+            tempEvent.setEventPlaceID(place_id);
+            tempEvent.setEventPlaceName(event_loc.getText().toString());
+        }
+        return tempEvent;
+    }
+
+    //Create timestamp
+    private Timestamp createTimestamp(String date, String time) {
+        SimpleDateFormat isoFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+        if (isDateSelected || isTimeSelected) {
+            try {
+                Date selectedDate = isoFormat.parse(date + " " + time);
+                Log.i(TAG, "Parsed event date: " + selectedDate.toString());
+                Timestamp timestamp = new Timestamp(selectedDate);
+                Log.i(TAG, "Created Timestamp for event: " + timestamp.toString());
+                newEvent.setEventDateAndTime(timestamp);
+                return timestamp;
+            } catch (ParseException e) {
+                Log.e(TAG, e.getMessage());
+            }
+        }
+        return null;
+    }
+
+    //Set from mapFragment updated event to ui
+    private void setEventDataToUI(MyEvent myEvent) {
+        if (myEvent.getEventName() != null) {
+            event_name.setText(myEvent.getEventName());
+        }
+        if (myEvent.getEventDescription() != null) {
+            event_desc.setText(myEvent.getEventDescription());
+        }
+        if (myEvent.getEventImg() != null) {
+            event_img.setImageBitmap(myEvent.getEventImg());
+            isImgSelected = true;
+        } else {
+            isImgSelected = false;
+        }
+        if (myEvent.getEventPlaceName() != null) {
+            event_loc.setText(myEvent.getEventPlaceName());
+            place_id = myEvent.getEventPlaceID();
+            isLocSelected = true;
+        } else {
+            isLocSelected = false;
+        }
+        //Parse timestamp to date and then to text(String)
+        if (myEvent.getEventDateAndTime() != null) {
+            SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy");
+            String dateString = dateFormatter.format(myEvent.getEventDateAndTime().toDate());
+            SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");
+            String timeString = timeFormatter.format(myEvent.getEventDateAndTime().toDate());
+            event_date.setText(dateString);
+            event_time.setText(timeString);
+            isTimeSelected = true;
+            isDateSelected = true;
+        } else {
+            isTimeSelected = false;
+            isDateSelected = false;
+        }
+        event_hide.setSelected(myEvent.isHidden());
+    }
+
+    private boolean isFormFilled() {
+        //Check if neccessary fields are filled
+        if (isNameFilled && isDescFilled && isDateSelected && isTimeSelected && isLocSelected) {
+            return true;
+        } else return false;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == nextEventCreateButton.getId()) {
+            //Form check
+            if (isFormFilled()) {
+                //Create instance from form
+                newEvent = createEventInstance();
+                newEvent.setOrganisatorID(authViewModel.isLoggedIn());
+                //Create event
+                eventViewModel.createEvent(newEvent, imageUri, getFileExtention(imageUri)).observe(getViewLifecycleOwner(), new Observer<MyEvent>() {
+                    @Override
+                    public void onChanged(MyEvent myEvent) {
+                        if (myEvent != null) {
+                            //Notify user on creation result
+                            Toast.makeText(getActivity(), "Event created", Toast.LENGTH_SHORT).show();
+                            NewEventFragmentDirections.ActionNewEventFragmentToEventProfileFragment action = NewEventFragmentDirections.actionNewEventFragmentToEventProfileFragment(myEvent);
+                            eventViewModel.cleanShareInstance();
+                            navController.navigate(action);
+                        } else {
+                            Toast.makeText(getActivity(), "Failed to create event", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        }
+        if (v.getId() == event_img.getId()) {
+            //Choose image
+            chooseImage();
+        }
+        if (v.getId() == event_date.getId()) {
+            //Choose date
+            showDatePickerDialog();
+        }
+        if (v.getId() == event_time.getId()) {
+            //Choose time
+            showTimePickerDialog();
+        }
+        if (v.getId() == event_loc.getId()) {
+            //Before navigating to mapFragment an event instance has to be created
+            //To generate a timestamp, both date and time must be selected
+            //Check if they both are selected or both are not selected
+            if ((isDateSelected && isTimeSelected) || (!isDateSelected && !isTimeSelected)) {
+                //If both are/are not selected navigate to mapFragment
+                eventViewModel.updateSharedInstance(createEventInstance()).observe(getViewLifecycleOwner(), new Observer<MyEvent>() {
+                    @Override
+                    public void onChanged(MyEvent myEvent) {
+                        navController.navigate(NewEventFragmentDirections.toNewEventMapFragment());
+                    }
+                });
+            } else {
+                //If only one of them is selected ask user to select the other one
+                if (!isTimeSelected) {
+                    event_time.setError("Please select time");
+                }
+                if (!isDateSelected) {
+                    event_date.setError("Please select date");
+                }
+            }
         }
     }
 }

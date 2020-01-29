@@ -11,9 +11,6 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -22,7 +19,13 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/events_feed"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    app:fastScrollEnabled="true"
+                    android:nestedScrollingEnabled="false"
+                    app:fastScrollHorizontalThumbDrawable="@drawable/thumb_drawable"
+                    app:fastScrollHorizontalTrackDrawable="@drawable/line_drawable"
+                    app:fastScrollVerticalThumbDrawable="@drawable/thumb_drawable"
+                    app:fastScrollVerticalTrackDrawable="@drawable/line_drawable"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -35,6 +38,5 @@
                     android:textColor="@android:color/tertiary_text_light"
                     android:textSize="20sp" />
             </RelativeLayout>
-        </ScrollView>
     </LinearLayout>
 </FrameLayout>

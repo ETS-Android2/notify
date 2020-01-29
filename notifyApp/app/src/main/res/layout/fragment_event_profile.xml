@@ -10,11 +10,21 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/event_profile_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/background_light"
+            android:elevation="6dp"
+            android:outlineAmbientShadowColor="@color/colorPrimaryDark"
+            android:outlineSpotShadowColor="@color/colorPrimaryDark"
+            android:visibility="visible" />
 
         <RelativeLayout
             android:id="@+id/profileHeader"
             android:layout_width="match_parent"
             android:layout_height="200dp"
+            android:layout_below="@id/event_profile_toolbar"
             android:background="@drawable/black_gradient">
 
 
@@ -218,6 +228,37 @@
                             android:text="xx photos, see all"
                             android:textSize="20sp" />
 
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:fontFamily="@font/open_sans_light"
+                            android:text="Organisator"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:id="@+id/event_profile_organisator_layout">
+
+                            <ImageView
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:layout_marginHorizontal="10dp"
+                                android:layout_marginTop="10dp"
+                                android:id="@+id/event_profile_organisator_img"/>
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:fontFamily="@font/open_sans_light"
+                                android:text="username"
+                                android:textSize="14sp"
+                                android:id="@+id/event_profile_organisator_name"/>
+                        </LinearLayout>
 
                     </LinearLayout>
 
@@ -233,11 +274,11 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
             android:layout_marginRight="36dp"
+            android:layout_marginBottom="16dp"
             android:background="@drawable/rounded_button"
             android:elevation="8dp"
             android:paddingHorizontal="20dp"
             android:text="Join"
-            android:textAllCaps="false"
-            android:layout_marginBottom="16dp"/>
+            android:textAllCaps="false" />
     </RelativeLayout>
 </FrameLayout>

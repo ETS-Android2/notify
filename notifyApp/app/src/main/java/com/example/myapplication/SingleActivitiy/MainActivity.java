@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -17,14 +18,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.myapplication.R;
-import com.example.myapplication.ViewModels.AuthViewModel;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -46,21 +45,22 @@ public class MainActivity extends AppCompatActivity {
     private FusedLocationProviderClient mFusedLocationClient;
     private FirebaseAuth firebaseAuth;
     private NavController navController;
-    private AuthViewModel authViewModel;
-
+    private BottomNavigationView bottomNav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         firebaseAuth = FirebaseAuth.getInstance();
-
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        final BottomNavigationView bottomNav = findViewById(R.id.bottom_nav);
-        NavigationUI.setupWithNavController(bottomNav, navController);
+        bottomNav = findViewById(R.id.bottom_nav);
+        bottomNav.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener() {
+            @Override
+            public void onNavigationItemReselected(@NonNull MenuItem menuItem) {
 
-        authViewModel = ViewModelProviders.of(this).get(AuthViewModel.class);
-        authViewModel.AuthViewModel();
+            }
+        });
+        NavigationUI.setupWithNavController(bottomNav, navController);
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -74,6 +74,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+
 
     }
 
@@ -209,6 +211,12 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.clear();
     }
 }
 
