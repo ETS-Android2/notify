@@ -19,9 +19,9 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.example.myapplication.Models.MyUser;
-import com.example.myapplication.R;
 import com.example.myapplication.ViewModels.AuthViewModel;
 import com.example.myapplication.ViewModels.EventViewModel;
+import com.example.myapplication.myapplication.notify_beta.R;
 import com.google.android.material.textfield.TextInputEditText;
 
 public class ProfileSettingsFragment extends Fragment {

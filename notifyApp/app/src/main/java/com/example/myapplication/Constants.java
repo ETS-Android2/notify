@@ -16,7 +16,7 @@ public class Constants {
     public static final String COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     public static final float DEFAULT_ZOOM = 18;
     public static final int PLACE_PICKER_REQUEST = 1;
-    public static final List<String> PRICE_LEVEL_REPRESENTATIONS = Arrays.asList("Çok uygun","Uygun","Pahalı","Çok pahalı");
+    public static final List<String> PRICE_LEVEL_REPRESENTATIONS = Arrays.asList("Very cheap","Cheap","Expensive","Very expensive");
     public static final int FILTER_IN_LIST = 111;
     public static final int FILTER_IN_DB = 222;
     public static final int UPLOAD_PAUSED = 555;

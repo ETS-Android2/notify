@@ -1,4 +1,4 @@
-package com.notify.notify_beta;
+package com.example.myapplication.notify_beta;
 
 import android.content.Context;
 

@@ -28,7 +28,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.myapplication.Constants;
-import com.example.myapplication.R;
+import com.example.myapplication.myapplication.notify_beta.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;

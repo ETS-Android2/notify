@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.myapplication.Adapters.AdapterViewPagerFeed;
-import com.example.myapplication.R;
+import com.example.myapplication.myapplication.notify_beta.R;
 import com.google.android.material.tabs.TabLayout;
 
 public class FeedFragment extends Fragment {

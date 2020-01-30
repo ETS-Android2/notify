@@ -20,9 +20,9 @@ import com.example.myapplication.Adapters.AdapderEventCard;
 import com.example.myapplication.Listeners.OnRecycleItemClickedListener;
 import com.example.myapplication.Models.MyEvent;
 import com.example.myapplication.Models.MyUser;
-import com.example.myapplication.R;
 import com.example.myapplication.ViewModels.EventViewModel;
 import com.example.myapplication.ViewModels.UsersViewModel;
+import com.example.myapplication.myapplication.notify_beta.R;
 
 import java.util.ArrayList;
 

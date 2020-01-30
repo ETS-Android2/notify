@@ -8,7 +8,8 @@ import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 
-import com.example.myapplication.R;
+import com.example.myapplication.myapplication.notify_beta.R;
+
 
 public class CalendarFragment extends Fragment {
 

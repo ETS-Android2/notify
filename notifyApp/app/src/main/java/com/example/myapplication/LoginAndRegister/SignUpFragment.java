@@ -20,9 +20,9 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
-import com.example.myapplication.LoginNavDirections;
-import com.example.myapplication.R;
 import com.example.myapplication.ViewModels.AuthViewModel;
+import com.example.myapplication.myapplication.notify_beta.LoginNavDirections;
+import com.example.myapplication.myapplication.notify_beta.R;
 import com.google.firebase.auth.FirebaseUser;
 
 import static androidx.navigation.Navigation.findNavController;

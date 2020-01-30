@@ -30,8 +30,8 @@ import androidx.navigation.Navigation;
 
 import com.example.myapplication.ImageOperations.PicassoCircleTransformation;
 import com.example.myapplication.Models.MyEvent;
-import com.example.myapplication.R;
 import com.example.myapplication.ViewModels.EventViewModel;
+import com.example.myapplication.myapplication.notify_beta.R;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.common.api.Status;

@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myapplication.Listeners.OnRecycleItemClickedListener;
 import com.example.myapplication.Models.MyImage;
-import com.example.myapplication.R;
+import com.example.myapplication.myapplication.notify_beta.R;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 

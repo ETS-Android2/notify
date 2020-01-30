@@ -33,9 +33,9 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.example.myapplication.Adapters.AdapterViewPagerUserProfile;
 import com.example.myapplication.Models.MyUser;
-import com.example.myapplication.R;
 import com.example.myapplication.ViewModels.AuthViewModel;
 import com.example.myapplication.ViewModels.EventViewModel;
+import com.example.myapplication.myapplication.notify_beta.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.squareup.picasso.Callback;

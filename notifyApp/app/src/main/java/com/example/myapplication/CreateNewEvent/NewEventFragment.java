@@ -33,9 +33,9 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.example.myapplication.myapplication.notify_beta.R;
 import com.example.myapplication.ImageOperations.PicassoCircleTransformation;
 import com.example.myapplication.Models.MyEvent;
-import com.example.myapplication.R;
 import com.example.myapplication.ViewModels.AuthViewModel;
 import com.example.myapplication.ViewModels.EventViewModel;
 import com.google.firebase.Timestamp;

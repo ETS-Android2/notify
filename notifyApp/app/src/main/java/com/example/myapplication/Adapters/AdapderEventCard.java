@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.myapplication.ImageOperations.PicassoCircleTransformation;
 import com.example.myapplication.Listeners.OnRecycleItemClickedListener;
 import com.example.myapplication.Models.MyEvent;
-import com.example.myapplication.R;
+import com.example.myapplication.myapplication.notify_beta.R;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 

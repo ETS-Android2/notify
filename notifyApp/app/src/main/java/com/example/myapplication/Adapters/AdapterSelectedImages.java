@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myapplication.Listeners.OnRecycleItemClickedListener;
 import com.example.myapplication.Models.MyImage;
-import com.example.myapplication.R;
+import com.example.myapplication.myapplication.notify_beta.R;
 
 import java.util.ArrayList;
 
