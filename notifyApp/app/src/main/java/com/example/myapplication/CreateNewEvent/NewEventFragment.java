@@ -43,6 +43,7 @@ import com.squareup.picasso.Picasso;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -421,6 +422,7 @@ public class NewEventFragment extends Fragment implements DatePickerDialog.OnDat
                 //Create instance from form
                 newEvent = createEventInstance();
                 newEvent.setOrganisatorID(authViewModel.isLoggedIn());
+                newEvent.setOrganisator(authViewModel.observeCurrentUser().getValue());
                 //Create event
                 eventViewModel.createEvent(newEvent, imageUri, getFileExtention(imageUri)).observe(getViewLifecycleOwner(), new Observer<MyEvent>() {
                     @Override
@@ -428,6 +430,9 @@ public class NewEventFragment extends Fragment implements DatePickerDialog.OnDat
                         if (myEvent != null) {
                             //Notify user on creation result
                             Toast.makeText(getActivity(), "Event created", Toast.LENGTH_SHORT).show();
+                            ArrayList<String> partList = new ArrayList<>();
+                            newEvent.setParticipantsID(partList);
+                            newEvent.getParticipantsID().add(authViewModel.isLoggedIn());
                             NewEventFragmentDirections.ActionNewEventFragmentToEventProfileFragment action = NewEventFragmentDirections.actionNewEventFragmentToEventProfileFragment(myEvent);
                             eventViewModel.cleanShareInstance();
                             navController.navigate(action);

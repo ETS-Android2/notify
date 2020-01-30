@@ -71,7 +71,7 @@ public class AdapderEventCard extends RecyclerView.Adapter<AdapderEventCard.even
         }
         holder.eventName.setText(tempEvent.getEventName());
         //Parse event timestamp
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/mm/yyyy hh:mm");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         holder.eventDate.setText(dateFormat.format(tempEvent.getEventDateAndTime().toDate()));
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

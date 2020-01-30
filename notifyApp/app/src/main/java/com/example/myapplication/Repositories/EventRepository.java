@@ -216,20 +216,18 @@ public class EventRepository extends Repository {
             myEvents = new MutableLiveData<>();
         }
         db = FirebaseFirestore.getInstance();
-        db.collection("events").whereEqualTo("organisatorID", userID).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        db.collection("events").whereEqualTo("organisatorID", userID).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    ArrayList<MyEvent> eventList = new ArrayList<>();
-                    for (QueryDocumentSnapshot event : task.getResult()) {
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if(e!=null){
+                    Log.e(TAG,e.getLocalizedMessage());
+                }else{ArrayList<MyEvent> eventList = new ArrayList<>();
+                    for (QueryDocumentSnapshot event : queryDocumentSnapshots) {
                         MyEvent tempEvent = event.toObject(MyEvent.class);
                         tempEvent.setEventID(event.getId());
                         eventList.add(tempEvent);
                     }
-                    myEvents.postValue(eventList);
-                } else {
-                    Log.e(TAG, "Error: " + task.getException().getMessage());
-                }
+                    myEvents.postValue(eventList);}
             }
         });
         return myEvents;
@@ -279,19 +277,19 @@ public class EventRepository extends Repository {
             joinedByCurrent = new MutableLiveData<>();
         }
         db = FirebaseFirestore.getInstance();
-        db.collection("events").whereArrayContains("participantsID", userID).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        db.collection("events").whereArrayContains("participantsID", userID).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if(e!=null){
+                    Log.e(TAG,e.getLocalizedMessage());
+                }else{
                     ArrayList<MyEvent> eventList = new ArrayList<>();
-                    for (QueryDocumentSnapshot event : task.getResult()) {
+                    for (QueryDocumentSnapshot event : queryDocumentSnapshots) {
                         MyEvent tempEvent = event.toObject(MyEvent.class);
                         tempEvent.setEventID(event.getId());
                         eventList.add(tempEvent);
                     }
                     joinedByCurrent.postValue(eventList);
-                } else {
-                    Log.e(TAG, "Error: " + task.getException().getMessage());
                 }
             }
         });

@@ -215,9 +215,13 @@ public class EventProfileFragment extends Fragment implements View.OnClickListen
         if (event.getParticipantsID() == null || event.getParticipantsID().isEmpty()) {
             partNum.setText("0 Participant");
             friendsNum.setText("See all");
+            friendsNum.setClickable(true);
+            partNum.setClickable(true);
         } else {
             partNum.setText(event.getParticipantsID().size() + " Participants");
             friendsNum.setText(calcFriendsNum(event.getParticipantsID(), currentUser.getFriendsIDs()) + " friends in there, see all");
+            friendsNum.setClickable(false);
+            partNum.setClickable(false);
         }
 
         if (event.getOrganisatorID().equals(userID)) {
