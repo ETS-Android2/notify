@@ -44,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/place_picker_img"
                 android:fontFamily="@font/open_sans_light"
-                android:text="Yer adı"
+                android:text="Place name"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="5dp"
@@ -59,7 +59,7 @@
                 android:layout_toRightOf="@id/place_picker_img"
                 android:fontFamily="@font/open_sans_light"
                 android:paddingTop="5dp"
-                android:text="Adres"
+                android:text="Addres"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -85,7 +85,7 @@
                 android:layout_below="@id/selected_rating"
                 android:fontFamily="@font/open_sans_light"
                 android:layout_toLeftOf="@id/selected_place_address"
-                android:text="Pahalılık Seviyesi:"
+                android:text="Expence:"
                 android:textSize="14sp"
                 android:textStyle="bold"/>
 
@@ -98,9 +98,10 @@
                 android:background="@drawable/rounded_button"
                 android:elevation="10dp"
                 android:paddingVertical="10dp"
-                android:text="Konumu onayla"
+                android:text="Confirm place"
                 android:textColor="@android:color/white"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                android:textAllCaps="false"/>
 
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
