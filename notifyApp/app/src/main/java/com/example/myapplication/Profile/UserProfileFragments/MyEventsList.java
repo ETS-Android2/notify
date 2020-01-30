@@ -22,7 +22,6 @@ import com.example.myapplication.Models.MyEvent;
 import com.example.myapplication.Models.MyUser;
 import com.example.myapplication.R;
 import com.example.myapplication.ViewModels.EventViewModel;
-import com.example.myapplication.ViewModels.UsersViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +43,6 @@ public class MyEventsList extends Fragment {
 
     //ViewModel
     private EventViewModel eventViewModel;
-    private UsersViewModel usersViewModel;
 
     //CustomListeners
     private OnRecycleItemClickedListener listenerForEvent;
@@ -71,8 +69,6 @@ public class MyEventsList extends Fragment {
         //Init viewModel
         eventViewModel = ViewModelProviders.of(requireActivity()).get(EventViewModel.class);
         eventViewModel.EventViewModel();
-        usersViewModel = ViewModelProviders.of(requireActivity()).get(UsersViewModel.class);
-        usersViewModel.UsersViewModel();
 
         //Init list
         createdEvents = new ArrayList<>();
@@ -146,15 +142,6 @@ public class MyEventsList extends Fragment {
                     createdEvents = myEvents;
                     adapderEventCard.setMyEventList(createdEvents);
                     adapderEventCard.notifyDataSetChanged();
-                    usersViewModel.getOrganisator(userID).observe(getViewLifecycleOwner(), new Observer<MyUser>() {
-                        @Override
-                        public void onChanged(MyUser user) {
-                            for (int i = 0; i<createdEvents.size();i++) {
-                                createdEvents.get(i).setOrganisator(user);
-                                adapderEventCard.notifyDataSetChanged();
-                            }
-                        }
-                    });
                     Log.i(TAG, "Created events list is updated");
                 }
             });
