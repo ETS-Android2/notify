@@ -68,6 +68,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         view.findViewById(R.id.googleSignInButton).setOnClickListener(this);
         view.findViewById(R.id.facebookSignInButton).setOnClickListener(this);
         view.findViewById(R.id.signUpIntentButton).setOnClickListener(this);
+        view.findViewById(R.id.forgot_password).setOnClickListener(this);
 
 
         return view;
@@ -130,14 +131,14 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                                     Toast.makeText(getContext(), "Login success", Toast.LENGTH_SHORT).show();
                                     LoginNavDirections.ActionGlobalUserProfileFragment action = LoginNavDirections.actionGlobalUserProfileFragment();
                                     action.setUserID(firebaseUser.getUid());
-                                    Log.i(TAG,"Authenticated userID: " + action.getUserID());
+                                    Log.i(TAG, "Authenticated userID: " + action.getUserID());
                                     navController.navigate(action);
                                     semaphore--;
                                 }
                             } else {
-                                    Log.e(TAG, "Can't find user");
-                                    Toast.makeText(getContext(), "Login failed", Toast.LENGTH_SHORT).show();
-                                    semaphore--;
+                                Log.e(TAG, "Can't find user");
+                                Toast.makeText(getContext(), "Login failed", Toast.LENGTH_SHORT).show();
+                                semaphore--;
 
                             }
                         }
@@ -146,7 +147,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 break;
             case R.id.googleSignInButton:
             case R.id.facebookSignInButton:
-                Toast.makeText(getContext(),"This service will be avaliable soon",Toast.LENGTH_SHORT).show();
+            case R.id.forgot_password:
+                Toast.makeText(getContext(), "This service will be avaliable soon", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.signUpIntentButton:
                 //Start signUp flow

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Notify-Beta</string>
     <string name="facebook_application_id" translatable="false">1266645696864760</string>
     <string name="facebook_login_protocol_scheme" translatable="false">fb1266645696864760</string>
     <string name="google_maps_api_key">AIzaSyCO8wXsKT-L6URooDi-6jx3sBbi-KLQago</string>
