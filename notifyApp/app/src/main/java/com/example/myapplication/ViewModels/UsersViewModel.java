@@ -20,6 +20,7 @@ public class UsersViewModel extends ViewModel {
     private LiveData<ArrayList<MyUser>> userList;
     private LiveData<ArrayList<MyUser>> participants;
     private LiveData<ArrayList<MyUser>> organisatorListForFeed;
+    private LiveData<MyUser> organisator;
 
     //Constructor
     public void UsersViewModel() {
@@ -80,6 +81,19 @@ public class UsersViewModel extends ViewModel {
     //Get participants of an event via their IDs
     private void getParticipantsForEvent(ArrayList<String> partList) {
         participants = usersRepo.getParticipants(partList);
+    }
+
+    //Get single user
+    public LiveData<MyUser> getOrganisator(String userID){
+        if(organisator == null){
+            organisator = new MutableLiveData<>();
+        }
+        getSingleOrgansiator(userID);
+        return organisator;
+    }
+
+    private void getSingleOrgansiator(String userID){
+        organisator = usersRepo.getOrganisator(userID);
     }
 
 }

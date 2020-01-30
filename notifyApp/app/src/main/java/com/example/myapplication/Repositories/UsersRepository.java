@@ -28,6 +28,7 @@ public class UsersRepository extends Repository {
     //Observable LiveDatas
     private MutableLiveData<ArrayList<MyUser>> receivedUsers = new MutableLiveData<>();
     private MutableLiveData<ArrayList<MyUser>> organisatorListForFeed;
+    private MutableLiveData<MyUser> organisator;
 
     //Organisator
     private ArrayList<MyUser> organisatorHolder;
@@ -131,5 +132,24 @@ public class UsersRepository extends Repository {
             }
         });
         return receivedUsers;
+    }
+
+    public LiveData<MyUser> getOrganisator(String userID){
+        if(organisator == null){
+            organisator = new MutableLiveData<>();
+        }
+        db.collection("users").document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    MyUser tempUser = task.getResult().toObject(MyUser.class);
+                    tempUser.setId(task.getResult().getId());
+                    organisator.postValue(tempUser);
+                }else{
+                    Log.e(TAG,"Error: " + task.getException().getMessage());
+                }
+            }
+        });
+        return organisator;
     }
 }
