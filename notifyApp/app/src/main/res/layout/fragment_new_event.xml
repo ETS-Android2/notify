@@ -13,7 +13,7 @@
         android:layout_marginHorizontal="36dp"
         android:layout_marginTop="40dp"
         android:fontFamily="@font/open_sans_light"
-        android:text="Etkinlik bilgileri"
+        android:text="Event Info"
         android:textColor="#000"
         android:textSize="24sp" />
 
@@ -45,7 +45,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:hint="Etkinlik adı"
+        android:hint="Event name"
         android:maxLines="2"
         android:layout_marginLeft="16dp" />
     </LinearLayout>
@@ -57,7 +57,7 @@
         android:layout_marginHorizontal="36dp"
         android:layout_marginVertical="15dp"
         android:fontFamily="@font/open_sans_light"
-        android:hint="Etkinlik açıklaması"
+        android:hint="Event description"
         android:inputType="textMultiLine"
         android:maxLines="6" />
 
@@ -119,7 +119,7 @@
             android:layout_marginTop="16dp"
             android:drawableLeft="@drawable/ic_placeholder_on_map_paper_in_perspective"
             android:fontFamily="@font/open_sans_light"
-            android:text="Konum seçiniz"
+            android:text="Select a place from map"
             android:textAlignment="viewEnd"
             android:textSize="24sp" />
 
@@ -130,7 +130,7 @@
             android:layout_below="@id/new_event_pickers"
             android:layout_marginTop="16dp"
             android:fontFamily="@font/open_sans_light"
-            android:text="Etkinliği gizle"
+            android:text="Hidden event"
             android:textSize="24sp" />
     </LinearLayout>
 
@@ -145,7 +145,7 @@
         android:elevation="5dp"
         android:paddingHorizontal="70dp"
         android:paddingVertical="10dp"
-        android:text="Oluştur"
+        android:text="Create event"
         android:textColor="@android:color/white"
         android:textSize="20sp" />
 
