@@ -18,7 +18,9 @@
             android:elevation="6dp"
             android:outlineAmbientShadowColor="@color/colorPrimaryDark"
             android:outlineSpotShadowColor="@color/colorPrimaryDark"
-            android:visibility="visible" />
+            android:visibility="visible"
+            app:title="Event Profile"
+            />
 
         <RelativeLayout
             android:id="@+id/profileHeader"

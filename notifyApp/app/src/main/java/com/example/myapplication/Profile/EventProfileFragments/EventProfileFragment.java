@@ -44,7 +44,9 @@ public class EventProfileFragment extends Fragment implements View.OnClickListen
 
     private static final String TAG = "EventProfileFragment: ";
 
+    //MyEvent
     private MyEvent event;
+    //Fields & Layouts
     private ImageView eventImg;
     private TextView eventName;
     private TextView eventDesc;
@@ -59,15 +61,22 @@ public class EventProfileFragment extends Fragment implements View.OnClickListen
     private ImageView organisatorImg;
     private TextView organisatorName;
     private LinearLayout organisatorLayout;
+
+    //Toolbar & MainActivity
     private Toolbar toolbar;
     private AppCompatActivity activityForBar;
+
+    //BottomNav View
     private BottomNavigationView bottomNav;
 
+    //NavController
     private NavController navController;
 
+    //ViewModels
     private EventViewModel eventViewModel;
     private AuthViewModel authViewModel;
 
+    //CurrentUser
     private MyUser currentUser;
     private String userID;
 
@@ -82,8 +91,10 @@ public class EventProfileFragment extends Fragment implements View.OnClickListen
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_event_profile, container, false);
 
+        //Get received event from list on event click
         event = EventProfileFragmentArgs.fromBundle(getArguments()).getSelectedEvent();
 
+        //Init fields
         eventImg = view.findViewById(R.id.event_profile_img);
         eventName = view.findViewById(R.id.profile_eventname);
         eventDesc = view.findViewById(R.id.event_profile_desc);
@@ -106,24 +117,32 @@ public class EventProfileFragment extends Fragment implements View.OnClickListen
             toolbar = view.findViewById(R.id.event_profile_toolbar);
             activityForBar = (AppCompatActivity) getActivity();
             activityForBar.setSupportActionBar(toolbar);
+            activityForBar.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_32dp);
+        activityForBar.getSupportActionBar().show();
 
         getActivity().setTitle("Event Profile");
 
+        //Init bottomNavigationView
         bottomNav = getActivity().findViewById(R.id.bottom_nav);
         bottomNav.setVisibility(View.GONE);
 
+        //Init viewModels
         eventViewModel = ViewModelProviders.of(requireActivity()).get(EventViewModel.class);
         eventViewModel.EventViewModel();
 
         authViewModel = ViewModelProviders.of(requireActivity()).get(AuthViewModel.class);
         authViewModel.AuthViewModel();
 
+        //Get shared current user
         currentUser = authViewModel.observeCurrentUser().getValue();
         Log.i(TAG, currentUser.getName());
         Log.i(TAG, currentUser.getId());
         userID = currentUser.getId();
 
+        //Set event data to ui
         setEventToUI();
 
         partNum.setOnClickListener(this);
@@ -133,12 +152,14 @@ public class EventProfileFragment extends Fragment implements View.OnClickListen
         galleryNum.setClickable(false);
         eventPlace.setOnClickListener(this);
 
+        //Get event organisator, if already received
         if(event.getOrganisator() != null){
             Picasso.get().load(event.getOrganisator().getProfileImage()).transform(new PicassoCircleTransformation()).into(organisatorImg);
             organisatorName.setText(event.getOrganisator().getName());
             organisatorLayout.setOnClickListener(this);
         }
 
+        //Get event gallery image references to calculate gallery image count
         eventViewModel.getGalleryStorageRefs(event.getEventID()).observe(getViewLifecycleOwner(), new Observer<ArrayList<StorageReference>>() {
             @Override
             public void onChanged(ArrayList<StorageReference> storageReferences) {
@@ -154,19 +175,17 @@ public class EventProfileFragment extends Fragment implements View.OnClickListen
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         navController = Navigation.findNavController(view);
-        activityForBar.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        activityForBar.getSupportActionBar().setDisplayShowHomeEnabled(true);
-        activityForBar.getSupportActionBar().show();
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_32dp);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Navigate back on back icon pressed
                 bottomNav.setVisibility(View.VISIBLE);
                 navController.popBackStack();
             }
         });
     }
 
+    //Set event data to ui
     private void setEventToUI() {
         eventJoin.setText("Join");
         eventJoin.setBackgroundColor(0x21C064);
@@ -224,6 +243,7 @@ public class EventProfileFragment extends Fragment implements View.OnClickListen
     }
 
     private void mapIntent() {
+        //Open event place in googleMaps
         if (event.getEventPlaceName() != null && event.getEventPlaceID() != null && !event.getEventPlaceID().isEmpty() && !event.getEventPlaceName().isEmpty()) {
             String placeNameForMap = event.getEventPlaceName().replace(" ", "%20");
             String placeIDForMap = event.getEventPlaceID();
@@ -244,6 +264,7 @@ public class EventProfileFragment extends Fragment implements View.OnClickListen
     @Override
     public void onClick(View v) {
         if (v.getId() == partNum.getId() || v.getId() == friendsNum.getId()) {
+            //Go to participants list
             String[] partList = new String[event.getParticipantsID().size()];
             if (partList.length == 0 || partList == null) {
                 Toast.makeText(getContext(), "No participants", Toast.LENGTH_SHORT).show();
@@ -256,31 +277,33 @@ public class EventProfileFragment extends Fragment implements View.OnClickListen
                 navController.navigate(action);
             }
         } else if (v.getId() == eventJoin.getId()) {
+            //Dis/join event & set ui accordingly
             if (isJoinedAlready()) {
                 eventViewModel.disjoinEvent(event.getEventID(), userID);
+                //Set color green
                 eventJoin.setBackground(getResources().getDrawable(R.drawable.rounded_button, getActivity().getTheme()));
-                ;
                 eventJoin.setText("Join");
             }
             eventViewModel.joinEvent(event.getEventID(), userID);
             //Set color pink
             eventJoin.setBackground(getResources().getDrawable(R.drawable.rounded_button_pink, getActivity().getTheme()));
-            ;
             eventJoin.setText("Joined");
         } else if (v.getId() == galleryNum.getId()) {
+            //Go to gallery
             EventProfileFragmentDirections.ActionEventProfileFragmentToEventGalleryFragment action = EventProfileFragmentDirections.actionEventProfileFragmentToEventGalleryFragment(event);
             navController.navigate(action);
         } else if (v.getId() == eventPlace.getId()) {
             mapIntent();
         }else if(v.getId() == organisatorLayout.getId()){
+            //Go to organisator profile
             EventProfileFragmentDirections.ActionEventProfileFragmentToUserProfileFragment action = EventProfileFragmentDirections.actionEventProfileFragmentToUserProfileFragment();
             action.setUser(event.getOrganisator());
             navController.navigate(action);
         }
     }
 
-
     private boolean isJoinedAlready() {
+        //If already joined set ui
         if (event.getParticipantsID().contains(userID)) {
             return true;
         } else return false;

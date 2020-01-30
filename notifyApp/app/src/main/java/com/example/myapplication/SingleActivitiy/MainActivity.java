@@ -1,5 +1,6 @@
 package com.example.myapplication.SingleActivitiy;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -7,6 +8,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -23,35 +27,45 @@ import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
+import com.example.myapplication.Constants;
 import com.example.myapplication.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.auth.FirebaseAuth;
 
 import static com.example.myapplication.Constants.COARSE_LOCATION;
 import static com.example.myapplication.Constants.ERROR_DIALOG_REQUEST;
 import static com.example.myapplication.Constants.FINE_LOCATION;
 import static com.example.myapplication.Constants.LOCATION_PERMISSION_REQUEST_CODE;
 import static com.example.myapplication.Constants.PERMISSIONS_REQUEST_ENABLE_GPS;
+import static com.example.myapplication.Constants.PERMISSION_REQUEST_INTERNET;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "Main Activity: ";
 
+    //Location permission
     private boolean mLocationPermissionGranted = false;
+
+    //LocationProviderClient
     private FusedLocationProviderClient mFusedLocationClient;
-    private FirebaseAuth firebaseAuth;
+
+    //NavController
     private NavController navController;
+
+    //BottomNav Viewm
     private BottomNavigationView bottomNav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Inflate view
         setContentView(R.layout.activity_main);
-        firebaseAuth = FirebaseAuth.getInstance();
+
+        //Init navController & BottomNavigation
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         bottomNav = findViewById(R.id.bottom_nav);
         bottomNav.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener() {
@@ -60,10 +74,13 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        //Attach navigation to bottomNavigation
         NavigationUI.setupWithNavController(bottomNav, navController);
 
+        //Get location service
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+        //Control bottomNav visibility, depending on destination
         navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
             @Override
             public void onDestinationChanged(@NonNull NavController controller, @NonNull NavDestination destination, @Nullable Bundle arguments) {
@@ -75,25 +92,64 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //Check internet permission
+        checkInternetPermission();
+        //Check internet connection
+        if(!checkConnection()){
+            androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+            builder.setTitle(Constants.ALERT_NOCONTITLE);
+            builder.setMessage(Constants.ALERT_NOCONMESSAGE);
+            builder.setNegativeButton(Constants.ALERT_NOCONBTN, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    finish();
+                }
+            });
+            builder.create();
+            builder.show();
+        }
 
 
-    }
 
-
-    @Override
-    protected void onStart() {
-        super.onStart();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         if (checkMapServices()) {
+            //check and ask permission if needed
             if (mLocationPermissionGranted) {
                 return;
             } else {
                 getLocationPermission();
             }
+        }
+    }
+
+    public boolean checkConnection(){
+        ConnectivityManager connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            Network network = connectivityManager.getActiveNetwork();
+            NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(network);
+            return capabilities != null && (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR));
+        }else{
+            return false;
+        }
+    }
+
+    private void checkInternetPermission(){
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.INTERNET)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            //Ask for permission if not granted
+            //Request permission
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.INTERNET},
+                    PERMISSION_REQUEST_INTERNET);
+        } else {
+            // Permission has already been granted
+            Log.i(TAG, "Internet Permission granted");
         }
     }
 
@@ -109,6 +165,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void buildAlertMessageNoGps() {
+        //Alert message
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("This application requires GPS to work properly, do you want to enable it?")
                 .setCancelable(false)
@@ -123,6 +180,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean isMapsEnabled() {
+        //Check if map enabled
         final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -193,7 +251,17 @@ public class MainActivity extends AppCompatActivity {
                     mLocationPermissionGranted = true;
                     //TODO initmap
                 }
-            }
+            }case PERMISSION_REQUEST_INTERNET:
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0) {
+                    for (int i = 0; i < grantResults.length; i++) {
+                        if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                            finish();
+                        }else{
+                            finish();
+                        }
+                    }
+                }
         }
     }
 
@@ -216,6 +284,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
+        //Clear bundle to avoid TransactionTooLargeException
         outState.clear();
     }
 }
