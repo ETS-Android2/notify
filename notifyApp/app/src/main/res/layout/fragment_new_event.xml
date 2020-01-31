@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+
+    <TextView
+        android:id="@+id/new_event_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="36dp"
+        android:layout_marginTop="40dp"
+        android:fontFamily="@font/open_sans_light"
+        android:text="Event Info"
+        android:textColor="#000"
+        android:textSize="24sp" />
+
+    <View
+        android:id="@+id/title_subline"
+        android:layout_width="match_parent"
+        android:layout_height="5px"
+        android:layout_below="@id/new_event_title"
+        android:layout_marginLeft="36dp"
+        android:layout_marginRight="220dp"
+        android:background="#000"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title_subline"
+        android:id="@+id/linear_img_name"
+        android:layout_marginHorizontal="36dp"
+        android:layout_marginTop="24dp">
+
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/ic_picture"
+        android:id="@+id/new_event_img"/>
+
+    <EditText
+        android:id="@+id/new_event_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:hint="Event name"
+        android:maxLines="2"
+        android:layout_marginLeft="16dp" />
+    </LinearLayout>
+    <EditText
+        android:id="@+id/new_event_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/linear_img_name"
+        android:layout_marginHorizontal="36dp"
+        android:layout_marginVertical="15dp"
+        android:fontFamily="@font/open_sans_light"
+        android:hint="Event description"
+        android:inputType="textMultiLine"
+        android:maxLines="6" />
+
+
+    <TextView
+        android:id="@+id/new_event_title2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="36dp"
+        android:layout_below="@id/new_event_desc"
+        android:fontFamily="@font/open_sans_light"
+        android:text="Etkinlik detayı"
+        android:textColor="#000"
+        android:textSize="24sp"
+        android:layout_marginTop="16dp"/>
+
+    <View
+        android:id="@+id/title_subline2"
+        android:layout_width="match_parent"
+        android:layout_height="5px"
+        android:layout_below="@id/new_event_title2"
+        android:layout_marginLeft="36dp"
+        android:layout_marginRight="220dp"
+        android:background="#000" />
+    <LinearLayout
+        android:id="@+id/new_event_pickers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title_subline2"
+        android:layout_marginHorizontal="36dp"
+        android:orientation="vertical"
+        android:layout_marginVertical="24dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_calendar"
+            android:fontFamily="@font/open_sans_light"
+            android:text="DD-MM-YYYY"
+            android:textAlignment="viewEnd"
+            android:textSize="24sp"
+            android:id="@+id/new_event_date_picker" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_time"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/open_sans_light"
+            android:text="HH:MM"
+            android:textAlignment="viewEnd"
+            android:textSize="24sp"
+            android:id="@+id/new_event_time_picker" />
+
+        <TextView
+            android:id="@+id/new_event_loc_picker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:drawableLeft="@drawable/ic_placeholder_on_map_paper_in_perspective"
+            android:fontFamily="@font/open_sans_light"
+            android:text="Select a place from map"
+            android:textAlignment="viewEnd"
+            android:textSize="24sp" />
+
+        <Switch
+            android:id="@+id/new_event_is_hidden"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/new_event_pickers"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/open_sans_light"
+            android:text="Hidden event"
+            android:textSize="24sp" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/submit_event_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginVertical="20dp"
+        android:background="@drawable/rounded_button"
+        android:elevation="5dp"
+        android:paddingHorizontal="70dp"
+        android:paddingVertical="10dp"
+        android:text="Create event"
+        android:textColor="@android:color/white"
+        android:textSize="20sp" />
+
+</RelativeLayout>
+

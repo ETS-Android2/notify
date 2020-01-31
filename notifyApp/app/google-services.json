@@ -29,6 +29,41 @@
       ],
       "api_key": [
         {
+          "current_key": "AIzaSyBntLnJL5lIssf1VBNInSxdIeWuBqUKA-8"
+        },
+        {
+          "current_key": "AIzaSyCO8wXsKT-L6URooDi-6jx3sBbi-KLQago"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "29471887166-m9hrt6fshok671382ct12tmpisqsae1o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:29471887166:android:e027f4ce5462e46cf8266f",
+        "android_client_info": {
+          "package_name": "com.notify.myapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "29471887166-m9hrt6fshok671382ct12tmpisqsae1o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBntLnJL5lIssf1VBNInSxdIeWuBqUKA-8"
+        },
+        {
           "current_key": "AIzaSyCO8wXsKT-L6URooDi-6jx3sBbi-KLQago"
         }
       ],

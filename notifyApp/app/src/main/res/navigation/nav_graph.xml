@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/loginNav">
+    <fragment
+        android:id="@+id/userProfileFragment"
+        android:name="com.notify.myapplication.Profile.UserProfileFragments.UserProfileFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile">
+        <argument
+            android:name="user"
+            android:defaultValue="@null"
+            app:argType="com.notify.myapplication.Models.MyUser"
+            app:nullable="true" />
+        <argument
+            android:name="userID"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <action
+            android:id="@+id/action_userProfileFragment_to_eventProfileFragment"
+            app:destination="@id/eventProfileFragment" />
+        <action
+            android:id="@+id/action_userProfileFragment_self"
+            app:destination="@id/userProfileFragment" />
+        <action
+            android:id="@+id/action_userProfileFragment_to_loginNav"
+            app:destination="@id/loginNav" />
+    </fragment>
+    <fragment
+        android:id="@+id/calendarFragment"
+        android:name="com.notify.myapplication.Calendar.CalendarFragment"
+        android:label="fragment_calendar"
+        tools:layout="@layout/fragment_calendar" />
+    <fragment
+        android:id="@+id/usersFragment"
+        android:name="com.notify.myapplication.FeedPages.UsersFragment"
+        android:label="fragment_userlist"
+        tools:layout="@layout/fragment_userlist" >
+        <argument
+            android:name="participantsList"
+            app:argType="string[]"
+            app:nullable="true" />
+        <action
+            android:id="@+id/action_usersFragment_to_userProfileFragment"
+            app:destination="@id/userProfileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/eventsFragment"
+        android:name="com.notify.myapplication.FeedPages.EventsFragment"
+        android:label="fragment_events"
+        tools:layout="@layout/fragment_events" />
+    <fragment
+        android:id="@+id/eventProfileFragment"
+        android:name="com.notify.myapplication.Profile.EventProfileFragments.EventProfileFragment"
+        android:label="fragment_event_profile"
+        tools:layout="@layout/fragment_event_profile" >
+        <argument
+            android:name="selectedEvent"
+            app:argType="com.notify.myapplication.Models.MyEvent" />
+        <action
+            android:id="@+id/action_eventProfileFragment_to_usersFragment"
+            app:destination="@id/usersFragment" />
+        <action
+            android:id="@+id/action_eventProfileFragment_to_eventGalleryFragment"
+            app:destination="@id/eventGalleryFragment" />
+        <action
+            android:id="@+id/action_eventProfileFragment_to_userProfileFragment"
+            app:destination="@id/userProfileFragment" />
+    </fragment>
+    <navigation android:id="@+id/loginNav"
+        app:startDestination="@id/loginFragment">
+        <fragment
+            android:id="@+id/loginFragment"
+            android:name="com.notify.myapplication.LoginAndRegister.LoginFragment"
+            android:label="activity_login"
+            tools:layout="@layout/fragment_login">
+            <action
+                android:id="@+id/to_signUpFragment"
+                app:destination="@id/signUpFragment" />
+        </fragment>
+        <fragment
+            android:id="@+id/signUpFragment"
+            android:name="com.notify.myapplication.LoginAndRegister.SignUpFragment"
+            android:label="activity_signup"
+            tools:layout="@layout/fragment_signup"/>
+        <action
+            android:id="@+id/action_global_userProfileFragment"
+            app:destination="@id/userProfileFragment"/>
+    </navigation>
+    <fragment
+        android:id="@+id/chatRoomFragment"
+        android:name="com.notify.myapplication.ChatRoom.ChatRoomFragment"
+        android:label="fragment_chat_room"
+        tools:layout="@layout/fragment_chat_room" />
+    <fragment
+        android:id="@+id/chatRoomListFragment"
+        android:name="com.notify.myapplication.ChatRoom.ChatRoomListFragment"
+        android:label="fragment_chat_room_list"
+        tools:layout="@layout/fragment_chat_room_list" >
+        <action
+            android:id="@+id/action_chatRoomListFragment_to_chatRoomFragment"
+            app:destination="@id/chatRoomFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/newEventFragment"
+        android:name="com.notify.myapplication.CreateNewEvent.NewEventFragment"
+        android:label="fragment_new_event"
+        tools:layout="@layout/fragment_new_event" >
+        <action
+            android:id="@+id/to_newEventMapFragment"
+            app:destination="@id/newEventMapFragment" />
+        <action
+            android:id="@+id/action_newEventFragment_to_eventProfileFragment"
+            app:destination="@id/eventProfileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/newEventMapFragment"
+        android:name="com.notify.myapplication.CreateNewEvent.NewEventMapFragment"
+        android:label="fragment_new_event_place"
+        tools:layout="@layout/fragment_new_event_place" >
+        <action
+            android:id="@+id/action_newEventMapFragment_to_newEventFragment"
+            app:destination="@id/newEventFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/feedFragment"
+        android:name="com.notify.myapplication.FeedPages.FeedFragment"
+        android:label="feed_holder"
+        tools:layout="@layout/feed_holder" >
+        <action
+            android:id="@+id/action_feedFragment_to_usersFragment"
+            app:destination="@id/usersFragment" />
+        <action
+            android:id="@+id/action_feedFragment_to_eventsFragment"
+            app:destination="@id/eventsFragment" />
+        <action
+            android:id="@+id/action_feedFragment_to_eventProfileFragment"
+            app:destination="@id/eventProfileFragment" />
+        <action
+            android:id="@+id/action_feedFragment_to_userProfileFragment"
+            app:destination="@id/userProfileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/eventGalleryFragment"
+        android:name="com.notify.myapplication.Profile.EventProfileFragments.EventGalleryFragment"
+        android:label="fragment_event_gallery"
+        tools:layout="@layout/fragment_event_gallery" >
+        <argument
+            android:name="event"
+            app:argType="com.notify.myapplication.Models.MyEvent" />
+    </fragment>
+</navigation>
